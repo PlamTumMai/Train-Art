@@ -1,15 +1,13 @@
-
 using UnityEngine;
 
 public class TrainHealth : MonoBehaviour
 {
     [Header("Health")]
     public int maxHP = 100;
-
     private int currentHP;
-    private bool isGameOver;
 
     public int CurrentHP => currentHP;
+    public bool IsMaxLevel => trainLevel >= maxLevel;
 
     [Header("Train Upgrade")]
     public int trainLevel = 1;
@@ -20,60 +18,32 @@ public class TrainHealth : MonoBehaviour
     void Start()
     {
         currentHP = maxHP;
-        Debug.Log("Train HP: " + currentHP);
     }
 
     public void TakeDamage(int damage)
     {
-        if (isGameOver) return;
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.GameOver)
+            return;
 
-        currentHP -= damage;
-        currentHP = Mathf.Max(currentHP, 0);
-
-        Debug.Log("Train HP: " + currentHP);
+        currentHP = Mathf.Max(0, currentHP - damage);
 
         if (currentHP <= 0)
-            GameOver();
+        {
+            GameManager.Instance?.TriggerGameOver();
+        }
     }
 
-    public void UpgradeTrain()
+    // เรียกจากปุ่ม "Upgrade Train" บนหน้า Station UI ได้เลย
+    public bool TryUpgradeTrain()
     {
-        if (trainLevel >= maxLevel)
-        {
-            Debug.Log("Train Level Max!");
-            return;
-        }
-
-        if (ScrapManager.Instance == null)
-        {
-            Debug.Log("ไม่พบ ScrapManager");
-            return;
-        }
-
-        if (ScrapManager.Instance.scrap < upgradeCost)
-        {
-            Debug.Log("Scrap ไม่เพียงพอ!");
-            return;
-        }
-
-        ScrapManager.Instance.scrap -= upgradeCost;
+        if (IsMaxLevel) return false;
+        if (GameManager.Instance == null) return false;
+        if (GameManager.Instance.CurrentState != GameState.Station) return false;
+        if (!GameManager.Instance.SpendScrap(upgradeCost)) return false;
 
         trainLevel++;
         maxHP += hpIncrease;
-        currentHP = maxHP;
-
-        Debug.Log(
-            "Train Level: " + trainLevel +
-            " | HP: " + currentHP + "/" + maxHP +
-            " | Scrap: " + ScrapManager.Instance.scrap
-        );
-    }
-
-    void GameOver()
-    {
-        isGameOver = true;
-
-        Debug.Log("GAME OVER - TRAIN DESTROYED");
-        Time.timeScale = 0f;
+        currentHP = maxHP; // ฮีลเต็มหลอดเมื่ออัปเกรด
+        return true;
     }
 }
