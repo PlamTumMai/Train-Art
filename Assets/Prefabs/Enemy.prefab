@@ -84,9 +84,9 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -5554571956256326826, guid: dd41f9ef8a5463148a3c27d9fd4a5c43, type: 3}
+  m_Sprite: {fileID: 220715021686296392, guid: cddac44ed0da5e64383c013aaebdd4f2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 1
+  m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 4.8, y: 3.6}
@@ -105,7 +105,7 @@ Animator:
   m_GameObject: {fileID: 3888694176521258861}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 63a29cda9e2de324ebda43ce44c8edd9, type: 2}
+  m_Controller: {fileID: 9100000, guid: 407a025451b2c0f44b68e390f8220a45, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -155,7 +155,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 4.8, y: 3.6}
+    oldSize: {x: 4.13, y: 2.98}
     newSize: {x: 4.8, y: 3.6}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -181,5 +181,6 @@ MonoBehaviour:
   moveSpeed: 1.5
   attackRange: 0.8
   attackInterval: 1.2
+  knockbackDuration: 0.2
   scoreReward: 100
   scrapReward: 10

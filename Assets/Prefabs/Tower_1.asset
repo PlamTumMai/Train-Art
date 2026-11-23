@@ -23,5 +23,5 @@ MonoBehaviour:
   maxLevel: 6
   upgradeScrapCost: 50
   damageIncrease: 5
-  fireRateDecrease: 0.1
+  fireRateDecrease: 0
   minFireRate: 0.2

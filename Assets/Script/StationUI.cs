@@ -71,19 +71,14 @@ public class StationUI : MonoBehaviour
 
     void Update()
     {
-        if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.Station)
+        if (GameManager.Instance == null ||
+            GameManager.Instance.CurrentState != GameState.Station)
             return;
 
         if (stationTimerText != null)
         {
             int sec = Mathf.CeilToInt(GameManager.Instance.StationTimeRemaining);
             stationTimerText.text = $"Departing in {sec}s";
-        }
-
-        // ถ้าผู้เล่นติดตั้งป้อมเพิ่มตอนจอดสถานี ให้สร้างปุ่มใต้ป้อมใหม่ทันที
-        if (CountOccupiedSlots() != activeWidgets.Count)
-        {
-            RebuildTowerWidgets();
         }
     }
 
@@ -121,54 +116,38 @@ public class StationUI : MonoBehaviour
         if (GameManager.Instance != null && GameManager.Instance.TryUpgradeEnergy())
             RefreshAllUI();
     }
-    TowerSlot[] GetAllSlots()
-    {
-        if (TowerPlacementManager.Instance != null && TowerPlacementManager.Instance.AllSlots != null)
-            return TowerPlacementManager.Instance.AllSlots;
-
-        return FindObjectsByType<TowerSlot>(FindObjectsSortMode.None);
-    }
-
-    int CountOccupiedSlots()
-    {
-        int count = 0;
-        foreach (TowerSlot slot in GetAllSlots())
-        {
-            if (slot != null && slot.IsOccupied) count++;
-        }
-
-        return count;
-    }
 
     void RebuildTowerWidgets()
     {
         ClearWidgets();
 
-        if (towerWidgetPrefab == null || widgetContainer == null || mainCam == null)
+        if (towerWidgetPrefab == null || widgetContainer == null)
             return;
 
-        Camera uiCam = (parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
-            ? parentCanvas.worldCamera
-            : null;
+        if (TowerPlacementManager.Instance == null)
+            return;
 
-        int currentScrap = GameManager.Instance != null ? GameManager.Instance.Scrap : 0;
+        TowerData[] availableTowers =
+            TowerPlacementManager.Instance.availableTowers;
 
-        foreach (TowerSlot slot in GetAllSlots())
+        if (availableTowers == null)
+            return;
+
+        int currentScrap = GameManager.Instance != null
+            ? GameManager.Instance.Scrap
+            : 0;
+
+        foreach (TowerData data in availableTowers)
         {
-            if (slot == null || !slot.IsOccupied) continue;
+            if (data == null) continue;
 
-            TowerUpgradeWidget widget = Instantiate(towerWidgetPrefab, widgetContainer);
-            widget.Setup(slot, RefreshAllUI);
+            TowerUpgradeWidget widget =
+                Instantiate(towerWidgetPrefab, widgetContainer);
+
+            // ผูก Widget กับประเภทอาวุธโดยตรง
+            widget.Setup(data, RefreshAllUI);
+
             widget.Refresh(currentScrap);
-
-            // แปลงพิกัดโลกใต้ป้อมเป็นพิกัดบน Canvas
-            Vector2 screenPos = mainCam.WorldToScreenPoint(slot.transform.position + widgetWorldOffset);
-            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                    widgetContainer, screenPos, uiCam, out Vector2 localPos))
-            {
-                RectTransform rt = widget.GetComponent<RectTransform>();
-                rt.localPosition = localPos;
-            }
 
             activeWidgets.Add(widget);
         }
@@ -188,23 +167,14 @@ public class StationUI : MonoBehaviour
     {
         int currentScrap = GameManager.Instance != null ? GameManager.Instance.Scrap : 0;
 
-        // อัปเดตปุ่มและข้อความอัปเกรดรถไฟ
+        // 1. อัปเดตปุ่มและข้อความอัปเกรดรถไฟ
         if (trainHealth != null)
         {
             if (trainInfoText != null)
             {
-                if (trainHealth.IsMaxLevel)
-                {
-                    trainInfoText.text =
-                        $"Train Lv.{trainHealth.trainLevel}/{trainHealth.maxLevel} (MAX)\n" +
-                        $"HP: {trainHealth.CurrentHP}/{trainHealth.maxHP}";
-                }
-                else
-                {
-                    trainInfoText.text =
-                        $"Train Lv.{trainHealth.trainLevel}/{trainHealth.maxLevel}\n" +
-                        $"HP: {trainHealth.CurrentHP}/{trainHealth.maxHP} (+{trainHealth.hpIncrease} HP)";
-                }
+                trainInfoText.text = trainHealth.IsMaxLevel
+                    ? $"Train Lv.{trainHealth.trainLevel}/{trainHealth.maxLevel} (MAX)\nHP: {trainHealth.CurrentHP}/{trainHealth.maxHP}"
+                    : $"Train Lv.{trainHealth.trainLevel}/{trainHealth.maxLevel}\nHP: {trainHealth.CurrentHP}/{trainHealth.maxHP} (+{trainHealth.hpIncrease} HP)";
             }
 
             if (trainHealth.IsMaxLevel)
@@ -215,48 +185,48 @@ public class StationUI : MonoBehaviour
             else
             {
                 if (trainCostText != null) trainCostText.text = $"{trainHealth.upgradeCost} Scrap";
-                if (trainUpgradeButton != null)
-                    trainUpgradeButton.interactable = currentScrap >= trainHealth.upgradeCost;
-            }
-            // อัปเดตปุ่มและข้อความอัปเกรดความเร็ว Energy
-            if (GameManager.Instance != null)
-            {
-                GameManager gm = GameManager.Instance;
-
-                if (energyInfoText != null)
-                {
-                    if (gm.IsEnergyMaxLevel)
-                    {
-                        energyInfoText.text =
-                            $"Energy Lv.{gm.energyLevel}/{gm.maxEnergyLevel} (MAX)\n" +
-                            $"Regen: {gm.energyRegenPerSecond:F1}/s";
-                    }
-                    else
-                    {
-                        string maxBonus = gm.maxEnergyIncreasePerLevel > 0f
-                            ? $"\nMax: {gm.maxEnergy:F0} (+{gm.maxEnergyIncreasePerLevel:F0})"
-                            : "";
-
-                        energyInfoText.text =
-                            $"Energy Lv.{gm.energyLevel}/{gm.maxEnergyLevel}\n" +
-                            $"Regen: {gm.energyRegenPerSecond:F1}/s (+{gm.regenIncreasePerLevel:F1}/s){maxBonus}";
-                    }
-                }
-
-                if (gm.IsEnergyMaxLevel)
-                {
-                    if (energyCostText != null) energyCostText.text = "MAX";
-                    if (energyUpgradeButton != null) energyUpgradeButton.interactable = false;
-                }
-                else
-                {
-                    if (energyCostText != null) energyCostText.text = $"{gm.energyUpgradeCost} Scrap";
-                    if (energyUpgradeButton != null) energyUpgradeButton.interactable = currentScrap >= gm.energyUpgradeCost;
-                }
+                if (trainUpgradeButton != null) trainUpgradeButton.interactable = currentScrap >= trainHealth.upgradeCost;
             }
         }
 
-        // อัปเดตปุ่มใต้ป้อมทุกกระบอก
+        // 2. อัปเดตปุ่มและข้อความอัปเกรดความเร็ว Energy (แยกออกมาอยู่นอก if ของรถไฟแล้ว)
+        if (GameManager.Instance != null)
+        {
+            GameManager gm = GameManager.Instance;
+
+            if (energyInfoText != null)
+            {
+                if (gm.IsEnergyMaxLevel)
+                {
+                    energyInfoText.text =
+                        $"Energy Lv.{gm.energyLevel}/{gm.maxEnergyLevel} (MAX)\n" +
+                        $"Regen: {gm.energyRegenPerSecond:F1}/s";
+                }
+                else
+                {
+                    string maxBonus = gm.maxEnergyIncreasePerLevel > 0f
+                        ? $"\nMax: {gm.maxEnergy:F0} (+{gm.maxEnergyIncreasePerLevel:F0})"
+                        : "";
+
+                    energyInfoText.text =
+                        $"Energy Lv.{gm.energyLevel}/{gm.maxEnergyLevel}\n" +
+                        $"Regen: {gm.energyRegenPerSecond:F1}/s (+{gm.regenIncreasePerLevel:F1}/s){maxBonus}";
+                }
+            }
+
+            if (gm.IsEnergyMaxLevel)
+            {
+                if (energyCostText != null) energyCostText.text = "MAX";
+                if (energyUpgradeButton != null) energyUpgradeButton.interactable = false;
+            }
+            else
+            {
+                if (energyCostText != null) energyCostText.text = $"{gm.energyUpgradeCost} Scrap";
+                if (energyUpgradeButton != null) energyUpgradeButton.interactable = currentScrap >= gm.energyUpgradeCost;
+            }
+        }
+
+        // 3. อัปเดตปุ่มอัปเกรดป้อมทั้งหมด
         foreach (TowerUpgradeWidget w in activeWidgets)
         {
             if (w != null) w.Refresh(currentScrap);

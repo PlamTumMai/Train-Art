@@ -17,11 +17,11 @@ MonoBehaviour:
   previewSprite: {fileID: 0}
   energyCost: 50
   towerPrefab: {fileID: 9070100594581970777, guid: 5fc8c2cc0bdf7474bb6d499a35593953, type: 3}
-  baseDamage: 10
-  baseFireRate: 1
+  baseDamage: 50
+  baseFireRate: 1.5
   searchRange: 20
   maxLevel: 6
-  upgradeScrapCost: 50
-  damageIncrease: 5
+  upgradeScrapCost: 120
+  damageIncrease: 10
   fireRateDecrease: 0.1
   minFireRate: 0.2

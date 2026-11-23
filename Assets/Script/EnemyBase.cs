@@ -13,6 +13,12 @@ public class EnemyBase : MonoBehaviour, IDamageable
     public float attackRange = 0.8f;
     public float attackInterval = 1.2f;
 
+    [Header("Knockback Settings")]
+    public float knockbackDuration = 0.2f;
+
+    private Vector2 knockbackVelocity;
+    private float knockbackTimer;
+
     [Header("Rewards (เมื่อตาย)")]
     public int scoreReward = 100;
     public int scrapReward = 10;
@@ -20,10 +26,8 @@ public class EnemyBase : MonoBehaviour, IDamageable
     public int CurrentHP { get; private set; }
     public bool IsDead { get; private set; }
 
-    // Event สำหรับแจ้ง WaveManager
     public event Action<EnemyBase> OnDied;
 
-    // Static Events สำหรับแจ้ง Boss HP Bar UI (ทำงานเฉพาะตัวที่ติ๊ก isBoss)
     public static event Action<EnemyBase> OnBossSpawned;
     public static event Action<int, int> OnBossHealthChanged;
     public static event Action OnBossDefeated;
@@ -50,7 +54,6 @@ public class EnemyBase : MonoBehaviour, IDamageable
 
     void Start()
     {
-        // กันเหนียวกรณีวางเทสต์ในฉากตรงๆ โดยไม่ได้ผ่าน WaveManager
         if (CurrentHP <= 0) CurrentHP = maxHP;
     }
 
@@ -65,6 +68,21 @@ public class EnemyBase : MonoBehaviour, IDamageable
                 return;
         }
 
+        // กำลังถูก Knockback
+        if (knockbackTimer > 0f)
+        {
+            transform.position += (Vector3)(knockbackVelocity * Time.deltaTime);
+
+            knockbackTimer -= Time.deltaTime;
+
+            if (knockbackTimer <= 0f)
+            {
+                knockbackVelocity = Vector2.zero;
+            }
+
+            return;
+        }
+
         float dist = Vector2.Distance(transform.position, targetPoint.position);
 
         if (dist > attackRange)
@@ -76,12 +94,14 @@ public class EnemyBase : MonoBehaviour, IDamageable
         else
         {
             attackTimer += Time.deltaTime;
+
             if (attackTimer >= attackInterval)
             {
                 if (trainHealth != null)
                 {
                     trainHealth.TakeDamage(damage);
                 }
+
                 attackTimer = 0f;
             }
         }
@@ -104,9 +124,19 @@ public class EnemyBase : MonoBehaviour, IDamageable
         }
     }
 
+    public void ApplyKnockback(Vector2 direction, float force)
+    {
+        if (IsDead) return;
+
+        // บังคับให้ Knockback ไปทางซ้ายเท่านั้น
+        knockbackVelocity = Vector2.left * force;
+        knockbackTimer = knockbackDuration;
+    }
+
     void Die()
     {
         if (IsDead) return;
+
         IsDead = true;
 
         GameManager.Instance?.AddKillAndScore(scoreReward, scrapReward);
