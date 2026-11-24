@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 4905646622705793024}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.48, y: 0.32, z: 0}
+  m_LocalPosition: {x: 0.41, y: 0.32, z: 0}
   m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -117,7 +117,7 @@ SpriteRenderer:
   m_MaskInteraction: 0
   m_Sprite: {fileID: 9149613862306389898, guid: 814bafaa7a76ee64d94f9918dbb3ca4d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 0
+  m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 13.8, y: 7.8}
@@ -140,7 +140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Tower
   bulletPrefab: {fileID: 7415989979864200928, guid: a868b4bccd5a96246856c56d137499bd, type: 3}
   firePoint: {fileID: 4067183433075196566}
-  rotatingPart: {fileID: 4067183433075196566}
+  rotatingPart: {fileID: 0}
   audioSource: {fileID: 563821636305704330}
   shootSound: {fileID: 8300000, guid: a2eefeb667913994eb0d548218364f9f, type: 3}
   shootVolume: 0.2

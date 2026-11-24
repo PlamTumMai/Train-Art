@@ -15,13 +15,13 @@ MonoBehaviour:
   towerName: Tower_2
   icon: {fileID: 6825854084925488792, guid: 814bafaa7a76ee64d94f9918dbb3ca4d, type: 3}
   previewSprite: {fileID: 0}
-  energyCost: 35
+  energyCost: 40
   towerPrefab: {fileID: 8824591497262171260, guid: 0b3d133dad68fc84984ed438681414d4, type: 3}
   baseDamage: 5
-  baseFireRate: 0.5
+  baseFireRate: 0.3
   searchRange: 20
-  maxLevel: 6
+  maxLevel: 3
   upgradeScrapCost: 100
-  damageIncrease: 2
+  damageIncrease: 1
   fireRateDecrease: 0.1
   minFireRate: 0.2

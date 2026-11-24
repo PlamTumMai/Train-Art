@@ -20,7 +20,7 @@ MonoBehaviour:
   baseDamage: 10
   baseFireRate: 1
   searchRange: 20
-  maxLevel: 6
+  maxLevel: 3
   upgradeScrapCost: 50
   damageIncrease: 5
   fireRateDecrease: 0

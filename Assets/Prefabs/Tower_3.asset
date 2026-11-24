@@ -15,7 +15,7 @@ MonoBehaviour:
   towerName: Tower_3
   icon: {fileID: 9149613862306389898, guid: 814bafaa7a76ee64d94f9918dbb3ca4d, type: 3}
   previewSprite: {fileID: 0}
-  energyCost: 50
+  energyCost: 100
   towerPrefab: {fileID: 9070100594581970777, guid: 5fc8c2cc0bdf7474bb6d499a35593953, type: 3}
   baseDamage: 50
   baseFireRate: 1.5

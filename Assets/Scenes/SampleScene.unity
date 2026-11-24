@@ -3720,7 +3720,7 @@ MonoBehaviour:
   stationDuration: 15
   maxEnergy: 100
   startEnergy: 20
-  energyRegenPerSecond: 2
+  energyRegenPerSecond: 1
   resetEnergyEachWave: 1
   energyLevel: 1
   maxEnergyLevel: 5
@@ -3776,7 +3776,7 @@ MonoBehaviour:
   maxHP: 100
   trainLevel: 1
   maxLevel: 5
-  upgradeCost: 100
+  upgradeCost: 25
   hpIncrease: 50
   damageSound: {fileID: 8300000, guid: adf1d96e47a17184fb695f3bb517bf5e, type: 3}
   damageVolume: 1
@@ -4015,9 +4015,9 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: 6df6b30047034d5498e9c9c1ef3cb2cd, type: 3}
+  m_Resource: {fileID: 8300000, guid: 5bea3fbe4aeda854f8839bf1fbd060b7, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.05
+  m_Volume: 1
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -4457,16 +4457,16 @@ RectTransform:
   m_GameObject: {fileID: 1099116715}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 112905697}
   m_Father: {fileID: 260758621}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 500, y: -250}
-  m_SizeDelta: {x: 220, y: 40}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -250, y: 350}
+  m_SizeDelta: {x: 220, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1099116717
 MonoBehaviour:
@@ -5219,7 +5219,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1272631989
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5256,7 +5256,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.68235296}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5827,7 +5827,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -180}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 160, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1394674540
 GameObject:
@@ -5939,7 +5939,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 15a12ecd1e5ed4b4b8aa5b796c0d098d, type: 2}
   ghostValidColor: {r: 1, g: 1, b: 1, a: 0.7}
   ghostInvalidColor: {r: 1, g: 0.3, b: 0.3, a: 0.6}
-  ghostScale: {x: 0.25, y: 0.25, z: 0.25}
+  ghostScale: {x: 1, y: 1, z: 1}
 --- !u!4 &1428416310
 Transform:
   m_ObjectHideFlags: 0
@@ -6045,12 +6045,12 @@ MonoBehaviour:
   intervalDecreasePerWave: 0.2
   minSpawnInterval: 0.8
   baseEnemyHP: 10
-  hpIncreasePerWave: 10
+  hpIncreasePerWave: 5
   baseEnemyDamage: 5
   damageIncreasePerWave: 2
   baseMoveSpeed: 1.2
-  speedIncreasePerWave: 0.25
-  bossHP: 3000
+  speedIncreasePerWave: 0.2
+  bossHP: 5000
   bossDamage: 20
   bossMoveSpeed: 0.5
 --- !u!4 &1502517081
@@ -8339,7 +8339,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -180}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 160, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1942994807
 MonoBehaviour:
