@@ -207,3 +207,8 @@ MonoBehaviour:
   lifeTime: 3
   enableKnockback: 1
   knockbackForce: 0.5
+  enableAOE: 0
+  aoeRadius: 1
+  aoeDamageMultiplier: 1
+  hitVFX: {fileID: 0}
+  hitVFXLifetime: 0.5

@@ -207,3 +207,8 @@ MonoBehaviour:
   lifeTime: 3
   enableKnockback: 1
   knockbackForce: 1
+  enableAOE: 1
+  aoeRadius: 2
+  aoeDamageMultiplier: 1
+  hitVFX: {fileID: 8709840894992427204, guid: 0077791001cf1664981bd760ed28d617, type: 3}
+  hitVFXLifetime: 0.5

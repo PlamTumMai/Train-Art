@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class EnemyBase : MonoBehaviour, IDamageable
@@ -19,6 +20,20 @@ public class EnemyBase : MonoBehaviour, IDamageable
     private Vector2 knockbackVelocity;
     private float knockbackTimer;
 
+    [Header("Damage Feedback")]
+    public AudioSource audioSource;
+    public AudioClip[] hitSounds = new AudioClip[2];
+
+    [Range(0f, 1f)]
+    public float hitVolume = 0.7f;
+
+    public Color damageColor = Color.red;
+    public float flashDuration = 0.15f;
+
+    private SpriteRenderer[] spriteRenderers;
+    private Color[] originalColors;
+    private Coroutine flashCoroutine;
+
     [Header("Rewards (เมื่อตาย)")]
     public int scoreReward = 100;
     public int scrapReward = 10;
@@ -35,6 +50,24 @@ public class EnemyBase : MonoBehaviour, IDamageable
     private Transform targetPoint;
     private TrainHealth trainHealth;
     private float attackTimer;
+
+    void Awake()
+    {
+        // ค้นหา SpriteRenderer ทั้งตัวศัตรูและลูกทั้งหมด
+        spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
+
+        // จดจำสีเดิมของแต่ละ SpriteRenderer
+        originalColors = new Color[spriteRenderers.Length];
+
+        for (int i = 0; i < spriteRenderers.Length; i++)
+        {
+            originalColors[i] = spriteRenderers[i].color;
+        }
+
+        // ค้นหา AudioSource อัตโนมัติ
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
+    }
 
     public void Initialize(Transform attackPoint, TrainHealth train, int hp, int dmg, float speed)
     {
@@ -54,7 +87,8 @@ public class EnemyBase : MonoBehaviour, IDamageable
 
     void Start()
     {
-        if (CurrentHP <= 0) CurrentHP = maxHP;
+        if (CurrentHP <= 0)
+            CurrentHP = maxHP;
     }
 
     void Update()
@@ -64,7 +98,9 @@ public class EnemyBase : MonoBehaviour, IDamageable
         if (GameManager.Instance != null)
         {
             GameState state = GameManager.Instance.CurrentState;
-            if (state != GameState.Gameplay && state != GameState.WaitingWaveClear)
+
+            if (state != GameState.Gameplay &&
+                state != GameState.WaitingWaveClear)
                 return;
         }
 
@@ -87,7 +123,9 @@ public class EnemyBase : MonoBehaviour, IDamageable
 
         if (dist > attackRange)
         {
-            Vector2 dir = ((Vector2)targetPoint.position - (Vector2)transform.position).normalized;
+            Vector2 dir = ((Vector2)targetPoint.position -
+                           (Vector2)transform.position).normalized;
+
             transform.position += (Vector3)(dir * moveSpeed * Time.deltaTime);
             attackTimer = 0f;
         }
@@ -111,6 +149,12 @@ public class EnemyBase : MonoBehaviour, IDamageable
     {
         if (IsDead) return;
 
+        // เล่นเสียงเมื่อได้รับ Damage
+        PlayHitSound();
+
+        // เปลี่ยนสีเป็นสีแดงชั่วคราว
+        PlayDamageFlash();
+
         CurrentHP = Mathf.Max(0, CurrentHP - amount);
 
         if (isBoss)
@@ -122,6 +166,75 @@ public class EnemyBase : MonoBehaviour, IDamageable
         {
             Die();
         }
+    }
+
+    void PlayHitSound()
+    {
+        if (hitSounds == null || hitSounds.Length == 0)
+            return;
+
+        // รวบรวมเสียงที่กำหนดไว้
+        System.Collections.Generic.List<AudioClip> availableSounds =
+            new System.Collections.Generic.List<AudioClip>();
+
+        foreach (AudioClip clip in hitSounds)
+        {
+            if (clip != null)
+                availableSounds.Add(clip);
+        }
+
+        if (availableSounds.Count == 0)
+            return;
+
+        // สุ่มเลือกเสียง
+        int randomIndex = UnityEngine.Random.Range(0, availableSounds.Count);
+        AudioClip randomSound = availableSounds[randomIndex];
+
+        // เล่นเสียงแยกจากตัวศัตรู
+        AudioSource.PlayClipAtPoint(
+            randomSound,
+            transform.position,
+            hitVolume
+        );
+    }
+
+    void PlayDamageFlash()
+    {
+        if (spriteRenderers == null || spriteRenderers.Length == 0)
+            return;
+
+        // หากโดนซ้ำ ให้เริ่มเอฟเฟกต์ใหม่
+        if (flashCoroutine != null)
+        {
+            StopCoroutine(flashCoroutine);
+        }
+
+        flashCoroutine = StartCoroutine(DamageFlashCoroutine());
+    }
+
+    IEnumerator DamageFlashCoroutine()
+    {
+        // เปลี่ยนเป็นสีแดง
+        for (int i = 0; i < spriteRenderers.Length; i++)
+        {
+            if (spriteRenderers[i] != null)
+            {
+                spriteRenderers[i].color = damageColor;
+            }
+        }
+
+        yield return new WaitForSeconds(flashDuration);
+
+        // คืนสีเดิม
+        for (int i = 0; i < spriteRenderers.Length; i++)
+        {
+            if (spriteRenderers[i] != null)
+            {
+                spriteRenderers[i].color = originalColors[i];
+            }
+        }
+
+        flashCoroutine = null;
     }
 
     public void ApplyKnockback(Vector2 direction, float force)

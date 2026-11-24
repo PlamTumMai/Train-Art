@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tower_3
   m_EditorClassIdentifier: Assembly-CSharp::TowerData
   towerName: Tower_3
-  icon: {fileID: -6457860020811845258, guid: 97963e14e3ffe524995f60b07f26b87c, type: 3}
+  icon: {fileID: 9149613862306389898, guid: 814bafaa7a76ee64d94f9918dbb3ca4d, type: 3}
   previewSprite: {fileID: 0}
   energyCost: 50
   towerPrefab: {fileID: 9070100594581970777, guid: 5fc8c2cc0bdf7474bb6d499a35593953, type: 3}

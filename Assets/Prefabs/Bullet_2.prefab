@@ -205,5 +205,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Bullet
   speed: 15
   lifeTime: 3
-  enableKnockback: 1
+  enableKnockback: 0
   knockbackForce: 0.05

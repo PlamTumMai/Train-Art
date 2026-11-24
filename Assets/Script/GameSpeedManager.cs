@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class GameSpeedManager : MonoBehaviour
 {
@@ -9,7 +10,12 @@ public class GameSpeedManager : MonoBehaviour
     public float fastSpeed = 2f;
     public float veryFastSpeed = 3f;
 
+    [Header("UI References")]
+    public TMP_Text speedButtonText;
+
     public float CurrentSpeed { get; private set; } = 1f;
+
+    private int speedIndex = 0;
 
     void Awake()
     {
@@ -31,6 +37,7 @@ public class GameSpeedManager : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnStateChanged += HandleStateChanged;
+
             HandleStateChanged(GameManager.Instance.CurrentState);
         }
     }
@@ -44,42 +51,46 @@ public class GameSpeedManager : MonoBehaviour
 
         if (Instance == this)
         {
-            Instance = null;
             Time.timeScale = 1f;
+            Instance = null;
         }
     }
 
-    // เปลี่ยนเป็นความเร็วปกติ
-    public void SetSpeed1x()
+    // กดปุ่มเพื่อเปลี่ยนความเร็ว
+    public void ToggleGameSpeed()
     {
-        SetGameSpeed(normalSpeed);
-    }
+        if (!CanChangeSpeed())
+            return;
 
-    // เร่งความเร็ว 2 เท่า
-    public void SetSpeed2x()
-    {
-        SetGameSpeed(fastSpeed);
-    }
+        speedIndex = (speedIndex + 1) % 3;
 
-    // เร่งความเร็ว 3 เท่า
-    public void SetSpeed3x()
-    {
-        SetGameSpeed(veryFastSpeed);
-    }
+        switch (speedIndex)
+        {
+            case 0:
+                CurrentSpeed = normalSpeed;
+                break;
 
-    void SetGameSpeed(float speed)
-    {
-        if (!CanChangeSpeed()) return;
+            case 1:
+                CurrentSpeed = fastSpeed;
+                break;
 
-        CurrentSpeed = speed;
+            case 2:
+                CurrentSpeed = veryFastSpeed;
+                break;
+        }
+
         Time.timeScale = CurrentSpeed;
 
-        Debug.Log($"Game Speed: {CurrentSpeed}x");
+        UpdateSpeedButtonText();
+
+        Debug.Log("Game Speed: " + CurrentSpeed + "x");
     }
 
+    // ตรวจสอบว่าสามารถเปลี่ยนความเร็วได้หรือไม่
     bool CanChangeSpeed()
     {
-        if (GameManager.Instance == null) return false;
+        if (GameManager.Instance == null)
+            return false;
 
         GameState state = GameManager.Instance.CurrentState;
 
@@ -87,26 +98,34 @@ public class GameSpeedManager : MonoBehaviour
                state == GameState.WaitingWaveClear;
     }
 
+    // ตรวจสอบเมื่อ GameState เปลี่ยน
     void HandleStateChanged(GameState state)
     {
-        // ออกจาก Gameplay ให้กลับเป็นความเร็วปกติ
-        if (state == GameState.Station ||
-            state == GameState.GameOver ||
-            state == GameState.Victory)
+        if (state == GameState.Station)
         {
-            Time.timeScale = normalSpeed;
-            return;
+            ResetSpeed();
         }
+    }
 
-        // กลับเข้าสู่ Gameplay ใช้ความเร็วที่เลือกไว้
-        if (state == GameState.Gameplay ||
-            state == GameState.WaitingWaveClear)
+    // รีเซ็ตความเร็วกลับเป็น 1x
+    public void ResetSpeed()
+    {
+        speedIndex = 0;
+        CurrentSpeed = normalSpeed;
+
+        Time.timeScale = normalSpeed;
+
+        UpdateSpeedButtonText();
+
+        Debug.Log("Game Speed Reset: 1x");
+    }
+
+    // อัปเดตข้อความบนปุ่ม
+    void UpdateSpeedButtonText()
+    {
+        if (speedButtonText != null)
         {
-            Time.timeScale = CurrentSpeed;
-        }
-        else
-        {
-            Time.timeScale = normalSpeed;
+            speedButtonText.text = CurrentSpeed.ToString("0") + "x";
         }
     }
 }

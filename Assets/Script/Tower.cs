@@ -8,6 +8,12 @@ public class Tower : MonoBehaviour
     [Tooltip("เว้นว่าง (None) เพื่อหมุนทั้งตัวป้อม")]
     public Transform rotatingPart;
 
+    [Header("Shooting Sound")]
+    public AudioSource audioSource;
+    public AudioClip shootSound;
+    [Range(0f, 1f)]
+    public float shootVolume = 0.7f;
+
     [Header("Aim Settings")]
     [Tooltip("ติ๊กถูกถ้าอยากให้ป้อมแค่หันซ้าย-ขวา (ฐานไม่เอียงตามความสูงศัตรู)")]
     public bool flipOnly = false;
@@ -18,11 +24,11 @@ public class Tower : MonoBehaviour
     public float outlineThickness = 14f;
     public Color[] upgradeOutlineColors = new Color[]
     {
-        new Color(0.2f, 1f, 0.3f, 1f),   // อัปเกรดรอบ 1 (Lv.2): เขียว
-        new Color(0.2f, 0.75f, 1f, 1f),  // อัปเกรดรอบ 2 (Lv.3): ฟ้า
-        new Color(0.75f, 0.3f, 1f, 1f),  // อัปเกรดรอบ 3 (Lv.4): ม่วง
-        new Color(1f, 0.8f, 0.1f, 1f),   // อัปเกรดรอบ 4 (Lv.5): ทอง
-        new Color(1f, 0.2f, 0.2f, 1f)    // อัปเกรดรอบ 5 (Lv.6): แดง
+        new Color(0.2f, 1f, 0.3f, 1f),
+        new Color(0.2f, 0.75f, 1f, 1f),
+        new Color(0.75f, 0.3f, 1f, 1f),
+        new Color(1f, 0.8f, 0.1f, 1f),
+        new Color(1f, 0.2f, 0.2f, 1f)
     };
 
     public TowerData Data { get; private set; }
@@ -48,7 +54,11 @@ public class Tower : MonoBehaviour
             targetRenderer = GetComponentInChildren<SpriteRenderer>();
 
         if (targetRenderer != null)
-            outlineMat = targetRenderer.material; // สร้าง Material แยกเฉพาะตัวป้อมนี้
+            outlineMat = targetRenderer.material;
+
+        // หา AudioSource อัตโนมัติถ้ายังไม่ได้กำหนด
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
     }
 
     public void Initialize(TowerData data, int startLevel = 1)
@@ -57,6 +67,7 @@ public class Tower : MonoBehaviour
         SearchRange = data.searchRange;
         ApplyLevel(startLevel);
     }
+
     public void ApplyLevel(int level)
     {
         if (Data == null) return;
@@ -78,7 +89,7 @@ public class Tower : MonoBehaviour
         if (outlineMat == null || !outlineMat.HasProperty("_OutlineSize"))
             return;
 
-        int upgradeCount = CurrentLevel - 1; // Lv.1 = 0 รอบ (ไม่มีขอบ)
+        int upgradeCount = CurrentLevel - 1;
 
         if (upgradeCount <= 0 || upgradeOutlineColors == null || upgradeOutlineColors.Length == 0)
         {
@@ -120,11 +131,13 @@ public class Tower : MonoBehaviour
     void CheckTargetsByTag(string tagName, ref float closestDist)
     {
         GameObject[] targets = GameObject.FindGameObjectsWithTag(tagName);
+
         foreach (GameObject obj in targets)
         {
             if (obj == null || !obj.activeInHierarchy) continue;
 
             float dist = Vector2.Distance(transform.position, obj.transform.position);
+
             if (dist < closestDist)
             {
                 closestDist = dist;
@@ -163,13 +176,24 @@ public class Tower : MonoBehaviour
 
         if (bulletPrefab != null && firePoint != null)
         {
-            GameObject bulletObj = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+            GameObject bulletObj = Instantiate(
+                bulletPrefab,
+                firePoint.position,
+                Quaternion.identity
+            );
+
             Bullet bullet = bulletObj.GetComponent<Bullet>();
 
             if (bullet != null)
             {
                 Vector2 dir = currentTarget.position - firePoint.position;
                 bullet.Initialize(dir, CurrentDamage);
+            }
+
+            // เล่นเสียงเมื่อยิงกระสุน
+            if (audioSource != null && shootSound != null)
+            {
+                audioSource.PlayOneShot(shootSound, shootVolume);
             }
         }
 
